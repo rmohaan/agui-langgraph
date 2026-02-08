@@ -71,7 +71,8 @@ remote_endpoint = CopilotKitRemoteEndpoint(
 # The constructor doesn't accept `agents__unsafe_dev_only`; set it after init.
 remote_endpoint.agents__unsafe_dev_only = [sdk]
 
-add_fastapi_endpoint(app, remote_endpoint, "/copilotkit")
+# When using the Backend directly, enable the below "/copilotkit" endpoint to enable the agent interactions.
+# add_fastapi_endpoint(app, remote_endpoint, "/copilotkit")
 add_langgraph_fastapi_endpoint(app, sdk, "/agui")
 
 # Simple test endpoint to verify the graph/agents and Ollama connectivity.

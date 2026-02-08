@@ -5,8 +5,24 @@ import { CopilotChat } from "@copilotkit/react-ui";
 import "@copilotkit/react-ui/styles.css";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+type SummaryData = {
+  summary: string;
+  key_points: string[];
+};
+
+type FinalCount = {
+  word_count: number;
+};
+
+type AgentState = {
+  messages: Array<Record<string, unknown>>;
+  summary_data: SummaryData | string | null;
+  final_count: FinalCount | number | null;
+  llm_status: string;
+};
+
 function AgentUI() {
-  const { state, running, run, nodeName } = useCoAgent({
+  const { state, running, nodeName } = useCoAgent<AgentState>({
     name: "ag-ui-langgraph",
     initialState: {
       messages: [],
@@ -19,16 +35,20 @@ function AgentUI() {
   const summaryText =
     state?.summary_data && typeof state.summary_data === "object"
       ? state.summary_data.summary
-      : state?.summary_data;
+      : typeof state?.summary_data === "string"
+        ? state.summary_data
+        : null;
 
   const wordCount =
     state?.final_count && typeof state.final_count === "object"
       ? state.final_count.word_count
-      : state?.final_count;
+      : typeof state?.final_count === "number"
+        ? state.final_count
+        : null;
 
   const [statusWord, setStatusWord] = useState<string>("Idle");
   const lastStatusAtRef = useRef<number>(0);
-  const pendingStatusRef = useRef<NodeJS.Timeout | null>(null);
+  const pendingStatusRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastNodeRef = useRef<string | null>(null);
 
   console.log("Current state:", state, "Current node name:", nodeName, "Is agent running?", running, "Status word:", statusWord);

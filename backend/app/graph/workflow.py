@@ -67,7 +67,7 @@ async def _emit_status(state: AgentState, config: RunnableConfig | None, status:
     )
     print(f"Status update emitted: {status}")
     # Give the event loop a moment so the stream can flush intermediate status updates.
-    await asyncio.sleep(0.5)
+    await asyncio.sleep(2.5)
 
 async def summarize_node(state: AgentState, config: RunnableConfig | None = None):
     input_text = _get_input_text(state)

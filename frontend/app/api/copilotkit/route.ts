@@ -15,7 +15,7 @@ const runtime = new CopilotRuntime({
       url: AGUI_ENDPOINT,
       agentId: "ag-ui-langgraph",
       description: "AG-UI LangGraph agent",
-    }),
+    }) as unknown as any,
   },
 });
 
