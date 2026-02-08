@@ -17,14 +17,11 @@ model = OpenAIChatModel(
             )
         )
 
-summarizer_agent = Agent(model, 
-                         instructions="You are a smart and efficient summarizer. Summarize the following text.", 
-                         output_type=SummaryOutput,
-                         system_prompt=(
-                            "Summarize the text. "
-                            "IMPORTANT: You must respond ONLY with a JSON object. "
-                            "Do not include any introductory text or markdown code blocks."
-                         )
-                    )
+summarizer_agent = Agent(
+    model,
+    instructions="Summarize the following text in 1-3 sentences.",
+    model_settings={"temperature": 0},
+    retries=3,
+)
 
 #  result_type=CountOutput, system_prompt="Count words in the text."

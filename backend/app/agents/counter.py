@@ -21,9 +21,7 @@ counter_agent = Agent(
     model,          
     instructions="You are a smart and efficient word counter. Count words in the text.",
     output_type=CountOutput,
-    system_prompt=(
-        "Count the number of words in the text. "
-        "IMPORTANT: You must respond ONLY with a JSON object. "
-        "Do not include any introductory text or markdown code blocks."
-    )
+    model_settings={"temperature": 0},
+    retries=3,
+    output_retries=3,
 )

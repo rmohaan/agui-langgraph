@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 # Note the specific integration path for the endpoint
 from copilotkit.integrations.fastapi import add_fastapi_endpoint
 from copilotkit import Action, CopilotKitRemoteEndpoint, LangGraphAGUIAgent
+from ag_ui_langgraph import add_langgraph_fastapi_endpoint
 from .graph.workflow import graph
 # from ag_ui_langgraph import add_langgraph_fastapi_endpoint
 
@@ -11,6 +12,9 @@ app = FastAPI()
 origins = [
     "http://localhost",
     "http://localhost:3000",
+    "http://127.0.0.1",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5173",
 ]
 
 app.add_middleware(
@@ -68,8 +72,7 @@ remote_endpoint = CopilotKitRemoteEndpoint(
 remote_endpoint.agents__unsafe_dev_only = [sdk]
 
 add_fastapi_endpoint(app, remote_endpoint, "/copilotkit")
-
-# add_langgraph_fastapi_endpoint(app, sdk, "/copilotkit")
+add_langgraph_fastapi_endpoint(app, sdk, "/agui")
 
 # Simple test endpoint to verify the graph/agents and Ollama connectivity.
 # POST JSON {"input_text": "..."} -> runs summarizer then counter and returns results.
