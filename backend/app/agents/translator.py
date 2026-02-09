@@ -33,5 +33,3 @@ translator_agent = Agent(
     model_settings={"temperature": 0},
     retries=3,
 )
-
-#  result_type=CountOutput, system_prompt="Count words in the text."
