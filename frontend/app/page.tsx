@@ -10,6 +10,10 @@ type SummaryData = {
   key_points: string[];
 };
 
+type TranslatedData = {
+  translated_text: string;
+};
+
 type FinalCount = {
   word_count: number;
 };
@@ -17,6 +21,7 @@ type FinalCount = {
 type AgentState = {
   messages: Array<Record<string, unknown>>;
   summary_data: SummaryData | string | null;
+  translated_data: TranslatedData | string | null;
   final_count: FinalCount | number | null;
   llm_status: string;
 };
@@ -27,6 +32,7 @@ function AgentUI() {
     initialState: {
       messages: [],
       summary_data: null,
+      translated_data: null,
       final_count: null,
       llm_status: "Idle",
     },
@@ -37,6 +43,13 @@ function AgentUI() {
       ? state.summary_data.summary
       : typeof state?.summary_data === "string"
         ? state.summary_data
+        : null;
+
+  const translatedText =
+    state?.translated_data && typeof state.translated_data === "object"
+      ? state.translated_data.translated_text
+      : typeof state?.translated_data === "string"
+        ? state.translated_data
         : null;
 
   const wordCount =
@@ -55,6 +68,7 @@ function AgentUI() {
 
   const mappedNodeStatus = useMemo(() => {
     if (nodeName === "summarizer") return "Summarizing";
+    if (nodeName === "translate") return "Translating";
     if (nodeName === "counter") return "Counting";
     return "";
   }, [nodeName]);
@@ -138,6 +152,13 @@ function AgentUI() {
             <p className="label">Summary</p>
             <p className={`summary-text ${summaryText ? "" : "summary-empty"}`}>
               {summaryText || "Awaiting summary..."}
+            </p>
+          </div>
+
+          <div className="summary-card">
+            <p className="label">Translation (Hindi)</p>
+            <p className={`summary-text ${translatedText ? "" : "summary-empty"}`}>
+              {translatedText || "Awaiting translation..."}
             </p>
           </div>
 

@@ -12,5 +12,6 @@ class AgentState(TypedDict):
     input_text: str
     messages: Optional[List[Dict[str, Any]]]
     summary_data: Optional[Dict[str, Any]]
+    translated_data: Optional[Dict[str, Any]]
     final_count: Optional[Dict[str, Any]]
     llm_status: Optional[str]

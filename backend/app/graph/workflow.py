@@ -7,6 +7,7 @@ from ag_ui_langgraph.types import CustomEventNames
 
 from ..schemas.state import AgentState
 from ..agents.summarizer import summarizer_agent
+from ..agents.translator import translator_agent
 from ..agents.counter import counter_agent
 
 def _get_input_text(state: AgentState) -> str:
@@ -115,11 +116,46 @@ async def count_node(state: AgentState, config: RunnableConfig | None = None):
     await _emit_status(state, config, "Completed")
     return {"final_count": count_payload, "llm_status": "Completed"}
 
+async def translate_node(state: AgentState, config: RunnableConfig | None = None):
+    print("Summary to translate:", state["summary_data"])
+    await _emit_status(state, config, "Translating")
+    summary_data = state.get("summary_data")
+    if isinstance(summary_data, dict):
+        summary_text = summary_data.get("summary")
+    else:
+        summary_text = getattr(summary_data, "summary", None)
+    input_text = _get_input_text(state)
+    text_to_translate = _clean_summary_text(summary_text or input_text or "")
+    try:
+        res = await translator_agent.run(text_to_translate)
+        if hasattr(res, "data"):
+            translated = res.data
+        elif hasattr(res, "output"):
+            translated = res.output
+        else:
+            translated = res
+    except Exception as exc:  # pylint: disable=broad-except
+        print("Translator failed, falling back to original summary:", exc)
+        translated = text_to_translate
+
+    if isinstance(translated, str):
+        translated_payload = {"translated_text": _clean_summary_text(translated)}
+    elif isinstance(translated, dict) and "translated_text" in translated:
+        translated_payload = translated
+    else:
+        translated_payload = {"translated_text": _clean_summary_text(str(translated))}
+
+    state["translated_data"] = translated_payload
+    await _emit_status(state, config, "Thinking")
+    return {"translated_data": translated_payload, "llm_status": "Thinking"}
+
 workflow = StateGraph(AgentState)
 workflow.add_node("summarizer", summarize_node)
+workflow.add_node("translate", translate_node)
 workflow.add_node("counter", count_node)
 workflow.add_edge(START, "summarizer")
-workflow.add_edge("summarizer", "counter")
+workflow.add_edge("summarizer", "translate")
+workflow.add_edge("translate", "counter")
 workflow.add_edge("counter", END)
 
 memory = MemorySaver()
